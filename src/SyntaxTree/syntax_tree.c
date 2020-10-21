@@ -10,6 +10,8 @@ SyntaxTree_* init_syntax_tree(type) {
     syntax_tree->MainFunc_AmountOfArgs = 0; // no more than 2
     syntax_tree->MainFunc_args = (void*)0; // the argument names
     syntax_tree->MainFunc_argTypes = (void*)0; // the argument types
+    syntax_tree->MainFuncReturnType = (void*)0;
+    syntax_tree->integer_returned = 0; // execution succeeded if the return method was reached
 
     /* Branch_Function_Declaration */
     syntax_tree->func_name = (void*)0;

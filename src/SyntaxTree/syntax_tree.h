@@ -17,12 +17,15 @@ typedef struct SyntaxTree {
     int MainFunc_AmountOfArgs; // no more than 2
     char** MainFunc_args; // the argument names
     char** MainFunc_argTypes; // the argument types
+    char* MainFuncReturnType;
+    int integer_returned; // the main function is int only, and ONLY EVER int
 
     /* Branch_Function_Declaration */
     char* func_name;
     int Funcargs;
     char** FunctionArgs;
     char** FunctionArgTypes;
+    char* FunctionReturnType;
 
     /* Branch_Return_Keyword */
     char* value_to_return; // this may change.

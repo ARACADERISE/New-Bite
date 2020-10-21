@@ -23,6 +23,39 @@ static Parser_* move_token_pointer(Parser_* parser, int current_token) {
     }
 }
 
+static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
+    redo:
+    switch(parser->curr_tokens->TokenType) {
+        case Token_return: {
+            move_token_pointer(parser, Token_return);
+            for(int i = 0; i < strlen(parser->curr_tokens->token_value); i++) {
+                if(isdigit(parser->curr_tokens->token_value[i])) {
+                    tree->integer_returned = atoi(&parser->curr_tokens->token_value[i]);
+                    break;
+                }
+
+                if(i == strlen(parser->curr_tokens->token_value-1)) {
+                    fprintf(stderr,"\nExpected a integer to be returned, got `%s`\n\tLine: %d\n", parser->curr_tokens->token_value,parser->lexer->line);
+                    exit(EXIT_FAILURE);
+                }
+            }
+            move_token_pointer(parser, Token_id); 
+            move_token_pointer(parser,Token_semicolon);
+            if(tree->integer_returned == 0) {
+                fprintf(stdout,"\nCompiled successfuly!\n\n");
+                exit(EXIT_SUCCESS);
+            } else {
+                fprintf(stderr,"\nError: Execution exited with exit status %d\n\n",tree->integer_returned);
+                exit(EXIT_FAILURE);
+            }
+            break;
+        }
+        default: {
+            exit(EXIT_SUCCESS);
+        }
+    }
+}
+
 static SyntaxTree_* parse_main_function(Parser_* parser) {
     move_token_pointer(parser,Token_id); // "main"
 
@@ -88,7 +121,7 @@ static SyntaxTree_* parse_main_function(Parser_* parser) {
                         case Token_Int: move_token_pointer(parser, Token_Int);break;
                         case Token_String: move_token_pointer(parser, Token_String); break;
                         default: {
-                            fprintf(stderr,"\nUncaught Array type `%s`.\n\n");
+                            fprintf(stderr,"\nUncaught Array type `%s`.\n\n", parser->curr_tokens->token_value);
                             exit(EXIT_FAILURE);
                         }
                     }
@@ -111,8 +144,32 @@ static SyntaxTree_* parse_main_function(Parser_* parser) {
                 move_token_pointer(parser, Token_RP);
         }
     }
+    
+    if(parser->curr_tokens->TokenType == Token_Colon) {
+        move_token_pointer(parser, Token_Colon);
 
-    return (void*)0;
+        switch(parser->curr_tokens->TokenType) {
+            case Token_Int: {
+                main_func_tree->MainFuncReturnType = parser->curr_tokens->token_value;
+                move_token_pointer(parser, Token_Int);
+                break;
+            }
+            default: {
+                fprintf(stderr,"\nThe main function can only return an integer\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+
+    if(parser->curr_tokens->TokenType != Token_LC) {
+        fprintf(stderr,"\nError: Missing `{` for main function\n");
+        exit(EXIT_FAILURE);
+    }
+    move_token_pointer(parser, Token_LC);
+
+    parse_main_function_body(parser, main_func_tree);
+
+    return main_func_tree;
 }
 
 static SyntaxTree_* parse_function(Parser_* parser) {
@@ -140,7 +197,8 @@ static SyntaxTree_* parse_token(Parser_* parser) {
 }
 
 static SyntaxTree_* start_parser(Parser_* parser) {
-    SyntaxTree_* def_tree = parse_token(parser);
+    SyntaxTree_* def_tree = calloc(1,sizeof(*def_tree));
+    def_tree = parse_token(parser);
 
     while(parser->curr_tokens->TokenType == Token_semicolon) {
         move_token_pointer(parser, Token_semicolon);
