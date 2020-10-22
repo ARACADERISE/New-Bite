@@ -28,6 +28,12 @@ void move_pointer(lexer_* lexer) {
             lexer->line++;
     }
 }
+void move_pointer_back(lexer_* lexer, int offset) {
+    if((lexer->source_code[lexer->index-offset] != '\0')) {
+        lexer->index-=offset;
+        lexer->current_char = lexer->source_code[lexer->index];
+    }
+}
 
 static void move_over_whitespace(lexer_* lexer) {
     do{
@@ -41,9 +47,16 @@ static Tokens_* move_pointer_with_token(char* value,int TokenId, lexer_* lexer) 
     return lexer->tokens;
 }
 
+static void parse_comment(lexer_* lexer) {
+    do {
+        move_pointer(lexer);
+        if(lexer->current_char == '\n') return move_pointer(lexer);
+        if(lexer->current_char == '\0') break;
+    } while(1);
+}
+
 Tokens_* get_next_token(lexer_* lexer) {
     do {
-
         if(lexer->current_char == ' ' || lexer->current_char == 10)
             move_over_whitespace(lexer);
 
@@ -57,6 +70,20 @@ Tokens_* get_next_token(lexer_* lexer) {
         }
 
         switch(lexer->current_char) {
+            case '/': {
+                move_pointer(lexer);
+                
+                if(lexer->current_char == '/') {
+                    move_pointer(lexer);
+                    parse_comment(lexer);
+                    break;
+                }
+                else {
+                    move_pointer_back(lexer, 1);
+                    printf("DIVISION!");
+                    exit(0);
+                }
+            }
             case '(': return move_pointer_with_token("(",Token_LP,lexer);break;
             case ')': return move_pointer_with_token(")",Token_RP,lexer);break;
             case ':': return move_pointer_with_token(":",Token_Colon,lexer);break;

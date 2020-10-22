@@ -12,12 +12,18 @@ SyntaxTree_* init_syntax_tree(type) {
     syntax_tree->MainFunc_argTypes = (void*)0; // the argument types
     syntax_tree->MainFuncReturnType = (void*)0;
     syntax_tree->integer_returned = 0; // execution succeeded if the return method was reached
+    syntax_tree->main_function_variable_names = (void*)0;
+    syntax_tree->main_function_variable_values = (void*)0;
+    syntax_tree->amount_of_variables_ = 0;
 
     /* Branch_Function_Declaration */
     syntax_tree->func_name = (void*)0;
     syntax_tree->Funcargs = 0;
     syntax_tree->FunctionArgs = (void*)0;
     syntax_tree->FunctionArgTypes = (void*)0;
+    syntax_tree->function_variable_names = (void*)0;
+    syntax_tree->function_variable_values = (void*)0;
+    syntax_tree->_amount_of_variables = 0;
 
     /* Branch_Return_Keyword */
     syntax_tree->value_to_return = (void*)0; // this may change.

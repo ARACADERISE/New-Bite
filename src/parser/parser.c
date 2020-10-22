@@ -26,6 +26,53 @@ static Parser_* move_token_pointer(Parser_* parser, int current_token) {
 static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
     redo:
     switch(parser->curr_tokens->TokenType) {
+        case Token_id: { // variable declaration
+            tree->amount_of_variables_++;
+            if(!(tree->main_function_variable_names))
+                tree->main_function_variable_names = calloc(
+                    tree->amount_of_variables_+1,
+                    sizeof(tree->main_function_variable_names)
+                );
+            else
+            {
+                tree->main_function_variable_names = realloc(
+                    tree->main_function_variable_names,
+                    (tree->amount_of_variables_+1)*sizeof(tree->main_function_variable_names)
+                );
+            }
+            tree->main_function_variable_names[tree->amount_of_variables_-1] = parser->curr_tokens->token_value;
+            move_token_pointer(parser, Token_id);
+
+            move_token_pointer(parser, Token_Colon);
+            move_token_pointer(parser, Token_Int);
+            move_token_pointer(parser, Token_Equals);
+            if(!(tree->main_function_variable_values))
+                tree->main_function_variable_values = calloc(
+                    tree->amount_of_variables_,
+                    sizeof(*tree->main_function_variable_values)
+                );
+            else
+            {
+                tree->main_function_variable_values = realloc(
+                    tree->main_function_variable_values,
+                    (tree->amount_of_variables_+1)*sizeof(*tree->main_function_variable_values)
+                );
+            }
+            tree->main_function_variable_values[tree->amount_of_variables_-1] = parser->curr_tokens->token_value;
+            move_token_pointer(parser, Token_id);
+            move_token_pointer(parser, Token_semicolon);
+            
+            if(parser->curr_tokens->TokenType == Token_RC)
+            {
+                printf("Compiled successfuly!");
+                break;
+            }
+            goto redo;
+        }
+        case Token_Int: {
+            fprintf(stderr,"\nUncaught reference to `Int` on line %d\n\n",parser->lexer->line);
+            exit(EXIT_FAILURE);
+        }
         case Token_return: {
             move_token_pointer(parser, Token_return);
             for(int i = 0; i < strlen(parser->curr_tokens->token_value); i++) {
@@ -42,6 +89,13 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
             move_token_pointer(parser, Token_id); 
             move_token_pointer(parser,Token_semicolon);
             if(tree->integer_returned == 0) {
+                if(tree->main_function_variable_names && tree->main_function_variable_values) {
+                    for(int i = 0; i < tree->amount_of_variables_; i++) {
+                        if(isdigit(*(char*)tree->main_function_variable_values[i])) {
+                            printf("GOT DIGIT!");
+                        }
+                    }
+                }
                 fprintf(stdout,"\nCompiled successfuly!\n\n");
                 exit(EXIT_SUCCESS);
             } else {
