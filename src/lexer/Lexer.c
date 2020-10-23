@@ -54,6 +54,22 @@ static void parse_comment(lexer_* lexer) {
         if(lexer->current_char == '\0') break;
     } while(1);
 }
+static void parse_multi_line_comment(lexer_* lexer) {
+    do {
+        move_pointer(lexer);
+        if(lexer->current_char == '*') {
+            move_pointer(lexer);
+
+            if(lexer->current_char == '/') {
+                return move_pointer(lexer);
+            }
+            else {
+                fprintf(stderr,"\nExpected end of multi-line comment, recieved `%c`\n\tLine %d\n",lexer->current_char,lexer->line);
+                exit(EXIT_FAILURE);
+            }
+        }
+    } while(1);
+}
 
 Tokens_* get_next_token(lexer_* lexer) {
     do {
@@ -76,6 +92,11 @@ Tokens_* get_next_token(lexer_* lexer) {
                 if(lexer->current_char == '/') {
                     move_pointer(lexer);
                     parse_comment(lexer);
+                    break;
+                }
+                if(lexer->current_char == '*') {
+                    move_pointer(lexer);
+                    parse_multi_line_comment(lexer);
                     break;
                 }
                 else {

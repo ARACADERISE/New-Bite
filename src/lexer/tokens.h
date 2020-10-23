@@ -8,6 +8,7 @@ typedef struct Tokens {
     enum {
         Token_id, // variable names, function names etc disregarding the main function
         Token_func_keyword,
+        Token_Print_Function,
         Token_LP,
         Token_RP,
         Token_LT,
@@ -22,6 +23,7 @@ typedef struct Tokens {
         Token_Int,
         Token_String,
         Token_Array,
+        Token_Void,
         Token_eof
     } TokenType;
 } Tokens_;
