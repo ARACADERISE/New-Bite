@@ -29,7 +29,7 @@ void move_pointer(lexer_* lexer) {
     }
 }
 void move_pointer_back(lexer_* lexer, int offset) {
-    if((lexer->source_code[lexer->index-offset] != '\0')) {
+    if(!(lexer->index-=offset < 0)) {
         lexer->index-=offset;
         lexer->current_char = lexer->source_code[lexer->index];
     }

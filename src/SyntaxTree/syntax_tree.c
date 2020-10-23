@@ -15,6 +15,7 @@ SyntaxTree_* init_syntax_tree(type) {
     syntax_tree->main_function_variable_names = (void*)0;
     syntax_tree->main_function_variable_values = (void*)0;
     syntax_tree->amount_of_variables_ = 0;
+    syntax_tree->main_function_variable_types = (void*)0;
 
     /* Branch_Function_Declaration */
     syntax_tree->func_name = (void*)0;
@@ -24,6 +25,7 @@ SyntaxTree_* init_syntax_tree(type) {
     syntax_tree->function_variable_names = (void*)0;
     syntax_tree->function_variable_values = (void*)0;
     syntax_tree->_amount_of_variables = 0;
+    syntax_tree->function_variable_types = (void*)0;
 
     /* Branch_Return_Keyword */
     syntax_tree->value_to_return = (void*)0; // this may change.

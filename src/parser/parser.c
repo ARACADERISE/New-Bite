@@ -44,7 +44,32 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
             move_token_pointer(parser, Token_id);
 
             move_token_pointer(parser, Token_Colon);
-            move_token_pointer(parser, Token_Int);
+            if(!(tree->main_function_variable_types))
+                tree->main_function_variable_types = calloc(
+                    tree->amount_of_variables_,
+                    sizeof(*tree->main_function_variable_types)
+                );
+            else
+                tree->main_function_variable_types = realloc(
+                    tree->main_function_variable_types,
+                    (tree->amount_of_variables_+1)*sizeof(*tree->main_function_variable_types)
+                );
+            switch(parser->curr_tokens->TokenType) {
+                case Token_Int: {
+                    tree->main_function_variable_types[tree->amount_of_variables_-1] = parser->curr_tokens->token_value;
+                    move_token_pointer(parser, Token_Int);
+                    break;
+                }
+                case Token_String: {
+                    tree->main_function_variable_types[tree->amount_of_variables_-1] = parser->curr_tokens->token_value;
+                    move_token_pointer(parser, Token_String);
+                    break;
+                }
+                default: {
+                    fprintf(stderr,"\nUncaught type for variable declaration on line %d\n\n",parser->lexer->line);
+                    exit(EXIT_FAILURE);
+                }
+            }
             move_token_pointer(parser, Token_Equals);
             if(!(tree->main_function_variable_values))
                 tree->main_function_variable_values = calloc(
@@ -52,12 +77,10 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
                     sizeof(*tree->main_function_variable_values)
                 );
             else
-            {
                 tree->main_function_variable_values = realloc(
                     tree->main_function_variable_values,
                     (tree->amount_of_variables_+1)*sizeof(*tree->main_function_variable_values)
                 );
-            }
             tree->main_function_variable_values[tree->amount_of_variables_-1] = parser->curr_tokens->token_value;
             move_token_pointer(parser, Token_id);
             move_token_pointer(parser, Token_semicolon);
@@ -89,13 +112,6 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
             move_token_pointer(parser, Token_id); 
             move_token_pointer(parser,Token_semicolon);
             if(tree->integer_returned == 0) {
-                if(tree->main_function_variable_names && tree->main_function_variable_values) {
-                    for(int i = 0; i < tree->amount_of_variables_; i++) {
-                        if(isdigit(*(char*)tree->main_function_variable_values[i])) {
-                            printf("GOT DIGIT!");
-                        }
-                    }
-                }
                 fprintf(stdout,"\nCompiled successfuly!\n\n");
                 exit(EXIT_SUCCESS);
             } else {

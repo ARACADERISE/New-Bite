@@ -20,6 +20,7 @@ typedef struct SyntaxTree {
     char* MainFuncReturnType;
     int integer_returned; // the main function is int only, and ONLY EVER int
     char** main_function_variable_names;
+    char** main_function_variable_types;
     void** main_function_variable_values;
     int amount_of_variables_;
 
@@ -30,6 +31,7 @@ typedef struct SyntaxTree {
     char** FunctionArgTypes;
     char* FunctionReturnType;
     char** function_variable_names;
+    char** function_variable_types;
     void** function_variable_values;
     int _amount_of_variables;
 
