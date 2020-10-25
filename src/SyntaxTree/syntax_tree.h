@@ -10,6 +10,7 @@ typedef struct SyntaxTree {
         Branch_String_Keyword,
         Branch_Int_Keyword,
         Branch_Array_Keword,
+        Branch_EOF
     } BranchType;
 
     /* Branch_MainFunction */

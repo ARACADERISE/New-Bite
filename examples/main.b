@@ -1,12 +1,10 @@
 /*
-    This is the main function
+    To do, work on other function declaration that can be used
 */
-//fun someFunction():Void {
-//    idk:Int = 10;
-//}
+
 fun main(args:Int, argv:Array<String>):Int {
-    name:Int = 15;
-    BRUH:Int = 15;
-    Print(BRUH);
-    ret 0;
+    age:Int = 15;
+    age_two:Int = 15;
+    Print(15);
+    ret 1;
 }

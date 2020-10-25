@@ -1,6 +1,7 @@
 #ifndef PARSER
 #define PARSER
 #include <stdlib.h>
+#include "../compiler/compiler.h"
 #include "../lexer/tokens.h"
 #include "../lexer/Lexer.h"
 #include "../SyntaxTree/syntax_tree.h"

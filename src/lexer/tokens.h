@@ -26,6 +26,7 @@ typedef struct Tokens {
         Token_Void,
         Token_eof
     } TokenType;
+    int main_was_found; // helper variable for now. Will be removed when the compiler is implemented
 } Tokens_;
 
 Tokens_* setup_token(int token_id, char* value);

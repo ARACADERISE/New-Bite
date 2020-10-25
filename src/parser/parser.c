@@ -91,7 +91,7 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
             
             if(parser->curr_tokens->TokenType == Token_RC)
             {
-                printf("\nCompiled successfuly!\n");
+                //printf("\nCompiled successfuly!\n");
                 break;
             }
             goto redo;
@@ -132,6 +132,10 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
 
                         if(i == tree->amount_of_variables_-1)
                         {
+                            if(isdigit(parser->curr_tokens->token_value[i])) {
+                                //printf("OHH");
+                                break;
+                            }
                             fprintf(stderr,"\nThe variable `%s` does not exist.\n",parser->curr_tokens->token_value);
                             exit(EXIT_FAILURE);
                         }
@@ -169,7 +173,7 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
 
             if(parser->curr_tokens->TokenType == Token_RC)
             {
-                printf("\nCompiled successfuly\n");
+                //printf("\nCompiled successfuly\n");
                 break;
             }
             goto redo;
@@ -199,13 +203,15 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
             // It is just a comfort thing for now
             // ToDo: Have execution codes(0 and 1) be returned and the compiler pick them up
             if(tree->integer_returned == 0) {
-                fprintf(stdout,"\nCompiled successfuly!\n");
-                exit(EXIT_SUCCESS);
+                //fprintf(stdout,"\nCompiled successfuly!\n");
+                //exit(EXIT_SUCCESS);
+                //break;
             } else {
-                fprintf(stderr,"\n\033[3;31mError: Execution exited with exit status %d\n\n\033[0m",tree->integer_returned);
-                exit(EXIT_FAILURE);
-                break;
+                //fprintf(stderr,"\n\033[3;31mError: Execution exited with exit status %d\n\n\033[0m",tree->integer_returned);
+                //exit(EXIT_FAILURE);
+                //break;
             }
+            CompileMainFunction(tree->integer_returned, tree->amount_of_variables_);
             break;
         }
         default: {
@@ -301,6 +307,8 @@ static SyntaxTree_* parse_main_function(Parser_* parser) {
             if(parser->curr_tokens->TokenType == Token_RP)
                 move_token_pointer(parser, Token_RP);
         }
+    } else {
+        move_token_pointer(parser, Token_RP);
     }
     
     if(parser->curr_tokens->TokenType == Token_Colon) {
@@ -331,6 +339,7 @@ static SyntaxTree_* parse_main_function(Parser_* parser) {
     move_token_pointer(parser, Token_LC);
 
     parse_main_function_body(parser, main_func_tree);
+    parser->curr_tokens->main_was_found = 0;
 
     return main_func_tree;
 }
@@ -353,7 +362,7 @@ static SyntaxTree_* parse_function(Parser_* parser) {
 
 static SyntaxTree_* parse_token(Parser_* parser, SyntaxTree_* current_tree) {
     switch(parser->curr_tokens->TokenType) {
-        case Token_func_keyword: return parse_function(parser);
+        case Token_func_keyword:return parse_function(parser);
         case Token_id: {
             fprintf(stderr,"\nSyntaxError:\n\tLine: %d\n\tThe value `%s` was not found inside a function, struct or enum.\n",parser->lexer->line-1,parser->curr_tokens->token_value);
             exit(EXIT_FAILURE);
