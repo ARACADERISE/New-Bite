@@ -3,12 +3,12 @@
 #include <string.h>
 #include <stdio.h>
 
-const char* DOT_GLOBAL = ".global";
-const char* MOVL = "movl";
-const char* RET = "ret";
+//const char* DOT_GLOBAL = ".global";
+//const char* MOVL = "movl";
+//const char* RET = "ret";
 
 // EAX REGISTER
-const char* EAX = "%%eax";
+//const char* EAX = "%%eax";
 
 void CompileMainFunction(int return_value, int amount_of_variables, SyntaxTree_* tree) {
 

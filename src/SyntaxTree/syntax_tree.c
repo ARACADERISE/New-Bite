@@ -1,6 +1,6 @@
 #include "syntax_tree.h"
 
-SyntaxTree_* init_syntax_tree(type) {
+SyntaxTree_* init_syntax_tree(int type) {
     SyntaxTree_* syntax_tree = calloc(1,sizeof(*syntax_tree));
 
     syntax_tree->BranchType = type;
