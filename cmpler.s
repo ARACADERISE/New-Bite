@@ -1,18 +1,23 @@
-.globl _start
-
+section .text
+	global _start
+	%define system_call int 0x80
 _start:
-	movl $1, %ebp
-	movl $1, %eax
 
-	push %ebp
-	movl %esp, %ebp
-	movl %ebp, %esp
-	pop %ebp
+	mov ecx, age
+	push ecx
+	push ebp
+	mov ebp, ecx
 
-	push %ebp
-	movl %esp, %ebp
-	movl %ebp, %esp
-	pop %ebp
+	mov ecx, age_two
+	push ecx
+	push ebp
+	mov ebp, ecx
+	system_call
 
-	int $0x80
-	ret
+	mov eax, 1
+	mov ebx, 0
+	system_call
+
+section .data
+	age equ 15
+	age_two equ 15

@@ -211,7 +211,7 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
                 //exit(EXIT_FAILURE);
                 //break;
             }
-            CompileMainFunction(tree->integer_returned, tree->amount_of_variables_);
+            CompileMainFunction(tree->integer_returned, tree->amount_of_variables_, tree);
             break;
         }
         default: {
