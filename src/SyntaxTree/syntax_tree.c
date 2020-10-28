@@ -11,7 +11,7 @@ SyntaxTree_* init_syntax_tree(int type) {
     syntax_tree->MainFunc_args = (void*)0; // the argument names
     syntax_tree->MainFunc_argTypes = (void*)0; // the argument types
     syntax_tree->MainFuncReturnType = (void*)0;
-    syntax_tree->integer_returned = 0; // execution succeeded if the return method was reached
+    syntax_tree->main_function_return_val = 0; // execution succeeded if the return method was reached
     syntax_tree->main_function_variable_names = (void*)0;
     syntax_tree->main_function_variable_values = (void*)0;
     syntax_tree->amount_of_variables_ = 0;

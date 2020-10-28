@@ -25,7 +25,7 @@ int main(int args, char* argv[]) {
     //Tokens_* tokens = (void*)0;
     Parser_* parser = init_parser(lex);
     SyntaxTree_* lang_tree = parse_bite(parser);
-    lang_tree = lang_tree; // to get rid of the warnings
 
+    COMPILE(lang_tree);
     return 0;
 }

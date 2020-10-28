@@ -188,7 +188,7 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
             move_token_pointer(parser, Token_return);
             for(int i = 0; i < strlen(parser->curr_tokens->token_value); i++) {
                 if(isdigit(parser->curr_tokens->token_value[i])) {
-                    tree->integer_returned = atoi(&parser->curr_tokens->token_value[i]);
+                    tree->main_function_return_val = atoi(&parser->curr_tokens->token_value[i]);
                     break;
                 }
 
@@ -199,19 +199,6 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
             }
             move_token_pointer(parser, Token_id); 
             move_token_pointer(parser,Token_semicolon);
-            // This will most likely change!
-            // It is just a comfort thing for now
-            // ToDo: Have execution codes(0 and 1) be returned and the compiler pick them up
-            if(tree->integer_returned == 0) {
-                //fprintf(stdout,"\nCompiled successfuly!\n");
-                //exit(EXIT_SUCCESS);
-                //break;
-            } else {
-                //fprintf(stderr,"\n\033[3;31mError: Execution exited with exit status %d\n\n\033[0m",tree->integer_returned);
-                //exit(EXIT_FAILURE);
-                //break;
-            }
-            CompileMainFunction(tree->integer_returned, tree->amount_of_variables_, tree);
             break;
         }
         default: {
@@ -384,9 +371,11 @@ static SyntaxTree_* start_parser(Parser_* parser) {
         move_token_pointer(parser, Token_semicolon);
 
         SyntaxTree_* tree = parse_token(parser,tree);
+
+        def_tree = tree;
     }
 
-    return (void*)0;
+    return def_tree;
 }
 
 SyntaxTree_* parse_bite(Parser_* parser) {

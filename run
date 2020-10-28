@@ -1,4 +1,13 @@
-make
+
+if [ ! $2 ]; then
+    if [ $1 ]; then
+        make RunBite FILE=$1
+    else
+        make RunBite
+    fi
+else
+    echo "Too many arguments"
+fi
 
 if [ -e main.o ]; then
     make ClearBite
