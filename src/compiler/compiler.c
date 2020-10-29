@@ -35,11 +35,11 @@ void evaluate_variables(FILE* file, SyntaxTree_* tree) {
 /* Evaluating all variables and printing ideals*/
     if(tree->amount_of_variables_ > 0)
     {
-        fprintf(file,"\nsegment .data");
+        fprintf(file,"\nsegment .rodata");
         for(int i = 0; i < tree->amount_of_variables_; i++)
         {
             if(strcmp(tree->main_function_variable_types[i],"Int")==0)
-                fprintf(file,"\n\t%s dw '%d'",tree->main_function_variable_names[i], atoi(tree->main_function_variable_values[i]));
+                fprintf(file,"\n\t%s dw %d",tree->main_function_variable_names[i], atoi(tree->main_function_variable_values[i]));
         }
     }
     if(tree->_amount_of_variables)
@@ -47,7 +47,7 @@ void evaluate_variables(FILE* file, SyntaxTree_* tree) {
         for(int i = 0; i < tree->_amount_of_variables; i++)
         {
             if(strcmp(tree->function_variable_types[i],"Int"))
-                fprintf(file,"\n\t%s dd '%d'",tree->function_variable_names[i], atoi(tree->function_variable_values[i]));
+                fprintf(file,"\n\t%s dw %d",tree->function_variable_names[i], atoi(tree->function_variable_values[i]));
         }
     }
 }

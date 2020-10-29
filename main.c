@@ -20,6 +20,7 @@ int main(int args, char* argv[]) {
         exit(1);
     }
 
+    //file_check_extension(argv[1],".b");
     char* code = read_file(argv[1]);
     lexer_* lex = init_lexer(code);
     //Tokens_* tokens = (void*)0;

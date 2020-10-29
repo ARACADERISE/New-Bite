@@ -9,5 +9,6 @@ typedef struct FileBuffer {
 } FileBuffer_;
 
 char* read_file(char* filename);
+char* file_check_extension(char* file_name, char* extension);
 
 #endif

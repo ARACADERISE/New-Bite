@@ -1,5 +1,6 @@
 #include "read_file.h"
 #include "helpers.h"
+#include <string.h>
 
 FileBuffer_* assign(size_t size) {
     FileBuffer_* buffer = calloc(1,sizeof(*buffer));
@@ -10,7 +11,50 @@ FileBuffer_* assign(size_t size) {
     return buffer;
 }
 
+char* convert_to_string(char char_) {
+    char* str = calloc(2,sizeof(*str));
+
+    str[0] = char_;
+    str[1] = '\0';
+    return str;
+}
+
+char* file_check_extension(char* file_name, char* extension) {
+
+    int index = 0;
+
+    char* curr_extension = calloc(1,sizeof(char));
+
+    for(; index < strlen(file_name); index++) {
+        if(file_name[index] == '.') {
+            do {
+
+                char* new_val = convert_to_string(file_name[index]);
+
+                curr_extension = realloc(
+                    curr_extension,
+                    (strlen(curr_extension)+2)*sizeof(char*)
+                );
+                strcat(curr_extension,new_val);
+
+                index++;
+                
+            } while(file_name[index] != '\0');
+        }
+    }
+
+    //if(!(strlen(curr_extension) >= 1)) {
+    //    strcat(file_name,extension);
+    //}
+    if(!(strcmp(curr_extension,extension)==0))
+        strcat(file_name,extension);
+
+    return file_name;
+}
+
 char* read_file(char* filename) {
+
+    file_check_extension(filename,".b");
     FILE* source_code = fopen(filename,"rb");
     char* code = calloc(1,sizeof(char));
     long size;

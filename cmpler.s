@@ -14,6 +14,6 @@ _start:
 	mov ebx, 0
 	system_call
 
-segment .data
-	age dw '15'
-	age_two dw '15'
+segment .rodata
+	age dw 15
+	age_two dw 15
