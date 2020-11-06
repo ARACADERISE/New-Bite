@@ -145,8 +145,7 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
 
                         if(i == tree->amount_of_variables_-1)
                         {
-                            if(isdigit(parser->curr_tokens->token_value[i])) {
-                                //printf("OHH");
+                            if(isdigit(parser->curr_tokens->token_value[0])) {
                                 break;
                             }
                             fprintf(stderr,"\nThe variable `%s` does not exist.\n",parser->curr_tokens->token_value);
@@ -163,7 +162,7 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
                                 (tree->n_items+1)*sizeof(*tree->things_to_print)
                             );
 
-                            tree->things_to_print[tree->n_items-1] = tree->main_function_variable_values[index];
+                            tree->things_to_print[tree->n_items-1] = tree->main_function_variable_names[index];
                         }
                     } else {
                         tree->n_items++;
@@ -350,6 +349,8 @@ static SyntaxTree_* parse_main_function(Parser_* parser) {
                 exit(EXIT_FAILURE);
             }
         }
+    } else {
+        main_func_tree->MainFuncReturnType = "Int";
     }
 
     if(parser->curr_tokens->TokenType != Token_LC) {

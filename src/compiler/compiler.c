@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 void CompileMainFunction(FILE* file, int return_value, int amount_of_variables, SyntaxTree_* tree) {
 
@@ -66,8 +67,24 @@ void evaluate_print_function(FILE* file, SyntaxTree_* tree)
         fprintf(file,"\nprint:\n");
         for(int i = 0; i < tree->n_items; i++)
         {
-            
-            fprintf(file,"\n\tmov eax, '%d'\n\tmov [var], eax\n\tmov ecx, var\n\tmov edx, %ld\n\tmov eax, 4\n\t mov ebx, 1\n\tsystem_call\n",atoi(tree->things_to_print[i]),strlen(tree->things_to_print[i]));
+            char* tree_val = tree->things_to_print[i];
+            if(isdigit(tree_val[0]))
+            {
+                fprintf(file,"\n\tmov eax, '%d'\n\tmov [var], eax\n\tmov ecx, var\n\tmov edx, %ld\n\tmov eax, 4\n\tmov ebx, 1\n\tsystem_call\n",atoi(tree_val),strlen(tree_val));
+            }
+            for(int x = 0; x < tree->amount_of_variables_; x++)
+            {
+                if(strcmp(tree->things_to_print[i],tree->main_function_variable_names[x])==0)
+                {
+                    fprintf(file,"\n\tmov eax, [%s]\n\tmov [var], eax\n\tmov ecx, var\n\tmov edx, %ld\n\tmov eax, 4\n\tmov ebx, 1\n\tsystem_call\n",tree->main_function_variable_names[x],strlen(tree->main_function_variable_values[x]));
+                    continue;
+                }
+                else 
+                {
+                    if(x == tree->amount_of_variables_ - 1) break;
+                    continue;
+                }
+            }
         }
         fprintf(file,"\n\tmov eax, 1\n\tmov ebx, 0\n\tsystem_call\n");
 
@@ -88,7 +105,7 @@ void COMPILE(SyntaxTree_* tree) {
             /* STARTUP OF THE MAIN FUNCTION */
             CompileMainFunction(file,tree->main_function_return_val, tree->amount_of_variables_, tree);
 
-            fprintf(file,"\n\n_start:\n\n\tpush ebp\n\tmov ebp, esp\n\tsub esp, 16\n\tsystem_call\n\tcall main\n\tmov eax, 1\n\tmov ebx, 0\n\tsystem_call\n");
+            fprintf(file,"\n\n_start:\n\n\tpush ebp\n\tmov ebp, esp\n\tsub esp, 16\n\tsystem_call\n\n\tcall main\n\tpop ebp\n\tmov esp, ebp\n\tsystem_call\n\n\tmov eax, 1\n\tmov ebx, 0\n\tsystem_call\n");
 
             //fprintf(file,"\n\tmov esp, ebp\n\tpop ebp\n\tsystem_call\n\n\tmov eax, 1\n\tmov ebx, %d\n\tsystem_call\n",tree->main_function_return_val);
 

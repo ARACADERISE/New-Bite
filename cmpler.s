@@ -11,6 +11,9 @@ main:
 	mov ecx, age_two
 	system_call
 
+	mov ecx, anotherAge
+	system_call
+
 	call print
 
 	mov eax, 1
@@ -24,19 +27,32 @@ _start:
 	mov ebp, esp
 	sub esp, 16
 	system_call
+
 	call main
+	pop ebp
+	mov esp, ebp
+	system_call
+
 	mov eax, 1
 	mov ebx, 0
 	system_call
 
 print:
 
-	mov eax, '15'
+	mov eax, '22'
 	mov [var], eax
 	mov ecx, var
 	mov edx, 2
 	mov eax, 4
-	 mov ebx, 1
+	mov ebx, 1
+	system_call
+
+	mov eax, [anotherAge]
+	mov [var], eax
+	mov ecx, var
+	mov edx, 3
+	mov eax, 4
+	mov ebx, 1
 	system_call
 
 	mov eax, 1
@@ -46,5 +62,6 @@ print:
 segment .bss
 	var resb 4
 section .rodata
-	age db '15'
-	age_two db '15'
+	age db '155'
+	age_two db '155'
+	anotherAge db '155'

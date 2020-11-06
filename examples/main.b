@@ -2,9 +2,10 @@
     To do, work on other function declaration that can be used
 */
 
-fun main():Int {
-    age:Int = 15;
+fun main() { // defaults to int if does not contain :Int or :Void
+    age:Int = 155;
     age_two:Int = age;
-    Print(age_two);
+    anotherAge:Int = age_two;
+    Print(22,anotherAge);
     ret 0;
 }
