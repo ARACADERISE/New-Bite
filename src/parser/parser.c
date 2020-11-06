@@ -85,7 +85,20 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
                     tree->main_function_variable_values,
                     (tree->amount_of_variables_+1)*sizeof(*tree->main_function_variable_values)
                 );
-            tree->main_function_variable_values[tree->amount_of_variables_-1] = parser->curr_tokens->token_value;
+
+            for(int i = 0; i < tree->amount_of_variables_; i++)
+            {
+                if(strcmp(parser->curr_tokens->token_value,tree->main_function_variable_names[i])==0)
+                {
+                    tree->main_function_variable_values[tree->amount_of_variables_-1] = tree->main_function_variable_values[i];
+                    break;
+                }
+
+                if(i == tree->amount_of_variables_-1)
+                    tree->main_function_variable_values[tree->amount_of_variables_-1] = parser->curr_tokens->token_value;
+            }
+            //tree->main_function_variable_values[tree->amount_of_variables_-1] = parser->curr_tokens->token_value;
+
             move_token_pointer(parser, Token_id);
             move_token_pointer(parser, Token_semicolon);
             
@@ -121,7 +134,7 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
                 REDO:
                 if(tree->main_function_variable_names)
                 {
-                    int index = 0; // zero by default
+                    int index = -1; // zero by default
                     for(int i = 0; i < tree->amount_of_variables_; i++)
                     {
                         if(strcmp(tree->main_function_variable_names[i],parser->curr_tokens->token_value)==0)
@@ -141,12 +154,37 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
                         }
                     }
 
-                    move_token_pointer(parser, Token_id);
-                    if(strcmp(tree->main_function_variable_types[index],"Int")==0)
-                    {
-                        int a = atoi(tree->main_function_variable_values[index]);
-                        printf("%d",a);
+                    if(index > -1){
+                        if(strcmp(tree->main_function_variable_types[index],"Int")==0)
+                        {
+                            tree->n_items++;
+                            tree->things_to_print = realloc(
+                                tree->things_to_print,
+                                (tree->n_items+1)*sizeof(*tree->things_to_print)
+                            );
+
+                            tree->things_to_print[tree->n_items-1] = tree->main_function_variable_values[index];
+                        }
+                    } else {
+                        tree->n_items++;
+                        tree->things_to_print = realloc(
+                            tree->things_to_print,
+                            (tree->n_items+1)*sizeof(*tree->things_to_print)
+                        );
+
+                        if(isdigit(parser->curr_tokens->token_value[0]))
+                        {
+                            tree->item_types = realloc(
+                                tree->item_types,
+                                (tree->n_items+1)*sizeof(*tree->item_types)
+                            );
+                            tree->item_types[tree->n_items-1] = "Int";
+                        }
+
+                        tree->things_to_print[tree->n_items-1] = parser->curr_tokens->token_value;
                     }
+
+                    move_token_pointer(parser, Token_id);
 
                     if(parser->curr_tokens->TokenType == Token_Comma)
                     {
@@ -164,11 +202,6 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
 
                     move_token_pointer(parser, Token_semicolon);
                 }
-            }
-            else
-            {
-                // second type of syntax
-                printf("%s",parser->curr_tokens->token_value);
             }
 
             if(parser->curr_tokens->TokenType == Token_RC)

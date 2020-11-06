@@ -43,11 +43,12 @@ char* file_check_extension(char* file_name, char* extension) {
         }
     }
 
-    //if(!(strlen(curr_extension) >= 1)) {
-    //    strcat(file_name,extension);
-    //}
     if(!(strcmp(curr_extension,extension)==0))
-        strcat(file_name,extension);
+    {
+        //strcat(file_name,extension);
+        fprintf(stderr,"\nBite compiler cannot read a file with extensions `%s`\n",curr_extension);
+        exit(EXIT_FAILURE);
+    }
 
     return file_name;
 }

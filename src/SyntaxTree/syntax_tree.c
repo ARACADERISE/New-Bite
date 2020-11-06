@@ -17,6 +17,11 @@ SyntaxTree_* init_syntax_tree(int type) {
     syntax_tree->amount_of_variables_ = 0;
     syntax_tree->main_function_variable_types = (void*)0;
 
+    /* Printing Function */
+    syntax_tree->things_to_print = calloc(1,sizeof(*syntax_tree->things_to_print));
+    syntax_tree->item_types = calloc(1,sizeof(*syntax_tree->item_types));
+    syntax_tree->n_items = 0;
+
     /* Branch_Function_Declaration */
     syntax_tree->func_name = (void*)0;
     syntax_tree->Funcargs = 0;

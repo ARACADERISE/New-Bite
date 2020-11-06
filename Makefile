@@ -20,7 +20,7 @@ FILE = examples/main.b
 #${COMPILE} ${NORMAL_C} ${LEXER_C} ${KEYWORD_LEXER_C} ${PARSER_C} ${PARSER_H} ${SYNTAX_TREE_C} ${COMPILER_C} && ./main.o examples/main.b && nasm -f elf *.s; ld -m elf_i386 -s -o demo cmpler.o && ./demo
 
 RunBite:
-	@${COMPILE} ${NORMAL_C} ${LEXER_C} ${KEYWORD_LEXER_C} ${PARSER_C} ${PARSER_H} ${SYNTAX_TREE_C} ${COMPILER_C} && ./main.o $(FILE) && nasm -f elf *.s; ld -m elf_i386 -s -o demo cmpler.o && ./demo
+	@${COMPILE} ${NORMAL_C} ${LEXER_C} ${KEYWORD_LEXER_C} ${PARSER_C} ${PARSER_H} ${SYNTAX_TREE_C} ${COMPILER_C} && ./main.o $(FILE) && nasm -f elf *.s; ld -m elf_i386 -s -o demo -dynamic-linker /lib/ld-linux.so.2 cmpler.o && ./demo
 
 
 ClearBite:

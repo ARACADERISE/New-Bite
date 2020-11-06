@@ -4,7 +4,7 @@
 
 fun main():Int {
     age:Int = 15;
-    age_two:Int = 15;
-    Print(15);
+    age_two:Int = age;
+    Print(age_two);
     ret 0;
 }

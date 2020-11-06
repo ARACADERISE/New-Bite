@@ -36,6 +36,11 @@ typedef struct SyntaxTree {
     void** function_variable_values;
     int _amount_of_variables;
 
+    /* Print function */
+    void** things_to_print;
+    char** item_types;
+    size_t n_items;
+
     /* Branch_Return_Keyword */
     char* value_to_return; // this may change.
 
