@@ -13,6 +13,9 @@ typedef struct SyntaxTree {
         Branch_EOF
     } BranchType;
 
+    /* If this is zero, we will not compile */
+    int errors;
+
     /* Branch_MainFunction */
     char* function_name; // should be main
     int MainFunc_AmountOfArgs; // no more than 2
@@ -39,7 +42,7 @@ typedef struct SyntaxTree {
     /* Print function */
     void** things_to_print;
     char** item_types;
-    size_t n_items;
+    size_t n_items_to_print;
 
     /* Branch_Return_Keyword */
     char* value_to_return; // this may change.

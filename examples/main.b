@@ -3,9 +3,7 @@
 */
 
 fun main() { // defaults to int if does not contain :Int or :Void
-    age:Int = 155;
-    age_two:Int = age;
-    anotherAge:Int = age_two;
-    Print(22,anotherAge);
+    age:In = 155;
+    Print(age,15,age,15,age);
     ret 0;
 }

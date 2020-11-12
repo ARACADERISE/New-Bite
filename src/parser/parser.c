@@ -18,14 +18,135 @@ static Parser_* move_token_pointer(Parser_* parser, int current_token) {
 
         return parser;
     } else {
-        fprintf(stderr,"\nError on line %d\n\tUnexpected value `%s`\n\t(Matched against token `%d`, when expecting `%d`)",parser->lexer->line,parser->curr_tokens->token_value,parser->curr_tokens->TokenType,current_token);
-        exit(1);
+        fprintf(stderr,"\nError on line %d\n\tUnexpected value `%s`\n\t(Matched against token `%d`, when expecting `%d`)\n\n",parser->lexer->line,parser->curr_tokens->token_value,parser->curr_tokens->TokenType,current_token);
+        Exit();
     }
 }
 
 static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
     redo:
     switch(parser->curr_tokens->TokenType) {
+        case Token_Print_Function: {
+            /*
+                THIS IS JUST TESTING!
+                THIS WILL BE REMOVED!
+            */
+            move_token_pointer(parser, Token_Print_Function);
+
+            if(parser->curr_tokens->TokenType == Token_LP)
+            {
+                // one type of syntax
+                move_token_pointer(parser, Token_LP);
+
+                if(parser->curr_tokens->TokenType != Token_id)
+                {
+                    fprintf(stderr,"\nMissing arguemtns for built-in Print statement.\n");
+                    tree->errors = 0;
+                    Exit();
+                }
+                
+                REDO:
+                if(!(tree->main_function_variable_names)) {
+                    tree-> n_items_to_print++;
+                    tree->things_to_print = realloc(
+                        tree->things_to_print,
+                        (tree-> n_items_to_print+1)*sizeof(*tree->things_to_print)
+                    );
+
+                    if(isdigit(parser->curr_tokens->token_value[0]))
+                    {
+                        tree->item_types = realloc(
+                            tree->item_types,
+                            (tree-> n_items_to_print+1)*sizeof(*tree->item_types)
+                        );
+                        tree->item_types[tree-> n_items_to_print-1] = "Int";
+                    }
+
+                    tree->things_to_print[tree-> n_items_to_print-1] = parser->curr_tokens->token_value;
+
+                    move_token_pointer(parser,Token_id);
+                }
+                if(tree->main_function_variable_names)
+                {
+                    int index = -1; // zero by default
+                    for(int i = 0; i < tree->amount_of_variables_; i++)
+                    {
+                        if(strcmp(tree->main_function_variable_names[i],parser->curr_tokens->token_value)==0)
+                        {
+                            index = i;
+                            break;
+                        }
+
+                        if(i == tree->amount_of_variables_-1)
+                        {
+                            if(isdigit(parser->curr_tokens->token_value[0])) {
+                                break;
+                            }
+                            fprintf(stderr,"\nThe variable `%s` does not exist.\n",parser->curr_tokens->token_value);
+                            Exit();
+                        }
+                    }
+
+                    if(index > -1){
+                        if(strcmp(tree->main_function_variable_types[index],"Int")==0)
+                        {
+                            tree-> n_items_to_print++;
+                            tree->things_to_print = realloc(
+                                tree->things_to_print,
+                                (tree-> n_items_to_print+1)*sizeof(*tree->things_to_print)
+                            );
+
+                            tree->things_to_print[tree-> n_items_to_print-1] = tree->main_function_variable_names[index];
+                        }
+                    } else {
+                        tree-> n_items_to_print++;
+                        tree->things_to_print = realloc(
+                            tree->things_to_print,
+                            (tree-> n_items_to_print+1)*sizeof(*tree->things_to_print)
+                        );
+
+                        if(isdigit(parser->curr_tokens->token_value[0]))
+                        {
+                            tree->item_types = realloc(
+                                tree->item_types,
+                                (tree-> n_items_to_print+1)*sizeof(*tree->item_types)
+                            );
+                            tree->item_types[tree-> n_items_to_print-1] = "Int";
+                        }
+
+                        tree->things_to_print[tree-> n_items_to_print-1] = parser->curr_tokens->token_value;
+                    }
+
+                    move_token_pointer(parser, Token_id);
+
+                    if(parser->curr_tokens->TokenType == Token_Comma)
+                    {
+                        move_token_pointer(parser, Token_Comma);
+                        goto REDO;
+                    }
+
+                    if(parser->curr_tokens->TokenType == Token_RP)
+                        move_token_pointer(parser, Token_RP);
+                    else
+                    {
+                        fprintf(stderr,"\n\033[3;31mError:\n\tMissing `)` for Print function\n\tLine: %d\n",parser->lexer->line);
+                        tree->errors = 0;
+                        Exit();
+                        //exit(EXIT_FAILURE);
+                    }
+
+                    move_token_pointer(parser, Token_semicolon);
+                }
+            }
+
+            if(parser->curr_tokens->TokenType == Token_RC)
+            {
+                //printf("\nCompiled successfuly\n");
+                break;
+            }
+            goto redo;
+            //exit(EXIT_SUCCESS);
+        }
         case Token_id: { // variable declaration
             tree->amount_of_variables_++;
             if(!(tree->main_function_variable_names))
@@ -45,7 +166,8 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
 
             if(parser->curr_tokens->TokenType != Token_Colon) {
                 fprintf(stderr,"\nVariable Error:\n\tLine: %d\n\tErr: Unrecognized variable declaration\n\tVariable: `%s`\n",parser->lexer->line-1,tree->main_function_variable_names[tree->amount_of_variables_-1]);
-                exit(EXIT_FAILURE);
+                tree->errors = 0;
+                Exit();
             }
             move_token_pointer(parser, Token_Colon);
             if(!(tree->main_function_variable_types))
@@ -71,7 +193,8 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
                 }
                 default: {
                     fprintf(stderr,"\nUncaught type for variable declaration on line %d\n\n",parser->lexer->line);
-                    exit(EXIT_FAILURE);
+                    tree->errors = 0;
+                    Exit();
                 }
             }
             move_token_pointer(parser, Token_Equals);
@@ -111,111 +234,15 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
         }
         case Token_Int: {
             fprintf(stderr,"\nUncaught reference to `Int` on line %d\n\n",parser->lexer->line);
-            exit(EXIT_FAILURE);
-        }
-        case Token_Print_Function: {
-            /*
-                THIS IS JUST TESTING!
-                THIS WILL BE REMOVED!
-            */
-            move_token_pointer(parser, Token_Print_Function);
-
-            if(parser->curr_tokens->TokenType == Token_LP)
-            {
-                // one type of syntax
-                move_token_pointer(parser, Token_LP);
-
-                if(parser->curr_tokens->TokenType != Token_id)
-                {
-                    fprintf(stderr,"\nMissing arguemtns for built-in Print statement.\n");
-                    exit(EXIT_FAILURE);
-                }
-                
-                REDO:
-                if(tree->main_function_variable_names)
-                {
-                    int index = -1; // zero by default
-                    for(int i = 0; i < tree->amount_of_variables_; i++)
-                    {
-                        if(strcmp(tree->main_function_variable_names[i],parser->curr_tokens->token_value)==0)
-                        {
-                            index = i;
-                            break;
-                        }
-
-                        if(i == tree->amount_of_variables_-1)
-                        {
-                            if(isdigit(parser->curr_tokens->token_value[0])) {
-                                break;
-                            }
-                            fprintf(stderr,"\nThe variable `%s` does not exist.\n",parser->curr_tokens->token_value);
-                            exit(EXIT_FAILURE);
-                        }
-                    }
-
-                    if(index > -1){
-                        if(strcmp(tree->main_function_variable_types[index],"Int")==0)
-                        {
-                            tree->n_items++;
-                            tree->things_to_print = realloc(
-                                tree->things_to_print,
-                                (tree->n_items+1)*sizeof(*tree->things_to_print)
-                            );
-
-                            tree->things_to_print[tree->n_items-1] = tree->main_function_variable_names[index];
-                        }
-                    } else {
-                        tree->n_items++;
-                        tree->things_to_print = realloc(
-                            tree->things_to_print,
-                            (tree->n_items+1)*sizeof(*tree->things_to_print)
-                        );
-
-                        if(isdigit(parser->curr_tokens->token_value[0]))
-                        {
-                            tree->item_types = realloc(
-                                tree->item_types,
-                                (tree->n_items+1)*sizeof(*tree->item_types)
-                            );
-                            tree->item_types[tree->n_items-1] = "Int";
-                        }
-
-                        tree->things_to_print[tree->n_items-1] = parser->curr_tokens->token_value;
-                    }
-
-                    move_token_pointer(parser, Token_id);
-
-                    if(parser->curr_tokens->TokenType == Token_Comma)
-                    {
-                        move_token_pointer(parser, Token_Comma);
-                        goto REDO;
-                    }
-
-                    if(parser->curr_tokens->TokenType == Token_RP)
-                        move_token_pointer(parser, Token_RP);
-                    else
-                    {
-                        fprintf(stderr,"\n\033[3;31mError:\n\tMissing `)` for Print function\n\tLine: %d\n",parser->lexer->line);
-                        exit(EXIT_FAILURE);
-                    }
-
-                    move_token_pointer(parser, Token_semicolon);
-                }
-            }
-
-            if(parser->curr_tokens->TokenType == Token_RC)
-            {
-                //printf("\nCompiled successfuly\n");
-                break;
-            }
-            goto redo;
-            //exit(EXIT_SUCCESS);
+            tree->errors = 0;
+            Exit();
         }
         case Token_return: {
             if(strcmp(tree->MainFuncReturnType,"Void")==0)
             {
                 fprintf(stdout,"\n\033[3;31mError:\n\tEncountered return statement in Void function.\n\tLine: %d\n",parser->lexer->line);
-                exit(EXIT_FAILURE);
+                tree->errors = 0;
+                Exit();
             }
             move_token_pointer(parser, Token_return);
             for(int i = 0; i < strlen(parser->curr_tokens->token_value); i++) {
@@ -226,7 +253,8 @@ static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree) {
 
                 if(i == strlen(parser->curr_tokens->token_value-1)) {
                     fprintf(stderr,"\nExpected a integer to be returned, got `%s`\n\tLine: %d\n", parser->curr_tokens->token_value,parser->lexer->line);
-                    exit(EXIT_FAILURE);
+                    tree->errors = 0;
+                    Exit();
                 }
             }
             move_token_pointer(parser, Token_id); 
@@ -244,7 +272,7 @@ static SyntaxTree_* parse_main_function(Parser_* parser) {
 
     if(parser->curr_tokens->TokenType == Token_semicolon) {
         fprintf(stderr,"\nError on line %d:\n\tCannot pre-define the main function\n", parser->lexer->line);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     move_token_pointer(parser, Token_LP);
@@ -257,7 +285,7 @@ static SyntaxTree_* parse_main_function(Parser_* parser) {
 
             if(main_func_tree->MainFunc_AmountOfArgs > 2) {
                 fprintf(stderr,"\nToo many arguments for the main functions.\n\n");
-                exit(1);
+                exit(EXIT_FAILURE);
             }
             main_func_tree->MainFunc_AmountOfArgs++;
             main_func_tree->MainFunc_args = realloc(

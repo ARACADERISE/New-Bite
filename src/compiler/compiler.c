@@ -1,7 +1,6 @@
 #include "compiler.h"
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <ctype.h>
 
 void CompileMainFunction(FILE* file, int return_value, int amount_of_variables, SyntaxTree_* tree) {
@@ -25,7 +24,7 @@ void CompileMainFunction(FILE* file, int return_value, int amount_of_variables, 
                 sprintf(&variables[i],"%s",tree->main_function_variable_names[i]);
             }
         }
-        if(tree->n_items > 0)
+        if(tree-> n_items_to_print > 0)
         {
             fprintf(file,"\n\tcall print\n");
         }
@@ -44,6 +43,7 @@ void evaluate_variables(FILE* file, SyntaxTree_* tree) {
     if(tree->amount_of_variables_ > 0)
     {
         fprintf(file,"\nsection .rodata");
+        fprintf(file,"\n\tmsg db \"\",0xa\n\tlen equ $ - msg\n");
         for(int i = 0; i < tree->amount_of_variables_; i++)
         {
             if(strcmp(tree->main_function_variable_types[i],"Int")==0)
@@ -65,42 +65,54 @@ void evaluate_print_function(FILE* file, SyntaxTree_* tree)
     {
 
         fprintf(file,"\nprint:\n");
-        for(int i = 0; i < tree->n_items; i++)
+        for(int i = 0; i < tree-> n_items_to_print; i++)
         {
             char* tree_val = tree->things_to_print[i];
             if(isdigit(tree_val[0]))
             {
-                fprintf(file,"\n\tmov eax, '%d'\n\tmov [var], eax\n\tmov ecx, var\n\tmov edx, %ld\n\tmov eax, 4\n\tmov ebx, 1\n\tsystem_call\n",atoi(tree_val),strlen(tree_val));
+                fprintf(file,"\n\tmov eax, '%d'\n\tmov [var], eax\n\tmov ecx, var\n\tmov edx, %ld\n\tmov eax, 4\n\tmov ebx, 1\n\tsystem_call\n\n\t;LINE BREAK\n\tmov ecx, msg\n\tmov edx, len\n\tmov eax, 4\n\tmov ebx, 1\n\tsystem_call\n",atoi(tree_val),strlen(tree_val));
             }
             for(int x = 0; x < tree->amount_of_variables_; x++)
             {
                 if(strcmp(tree->things_to_print[i],tree->main_function_variable_names[x])==0)
                 {
-                    fprintf(file,"\n\tmov eax, [%s]\n\tmov [var], eax\n\tmov ecx, var\n\tmov edx, %ld\n\tmov eax, 4\n\tmov ebx, 1\n\tsystem_call\n",tree->main_function_variable_names[x],strlen(tree->main_function_variable_values[x]));
-                    continue;
+                    fprintf(file,"\n\tmov eax, [%s]\n\tmov [var], eax\n\tmov ecx, var\n\tmov edx, %ld\n\tmov eax, 4\n\tmov ebx, 1\n\tsystem_call\n\n\t;LINE BREAK\n\tmov ecx, msg\n\tmov edx, len\n\tmov eax, 4\n\tmov ebx, 1\n\tsystem_call\n",tree->main_function_variable_names[x],strlen(tree->main_function_variable_values[x]));
                 }
                 else 
                 {
                     if(x == tree->amount_of_variables_ - 1) break;
-                    continue;
                 }
             }
         }
         fprintf(file,"\n\tmov eax, 1\n\tmov ebx, 0\n\tsystem_call\n");
 
         fprintf(file,"\nsegment .bss\n\tvar resb 4");
+
+        if(!(tree->main_function_variable_names))
+        {
+            /*fprintf(file,"\nsegment .rodata:\n");
+            fprintf(file,"\n\tmsg db \"\", 0xa\n\tlen equ $ - msg\n");*/
+        }
     }
 }
 
+void Exit()
+{
+    exit(EXIT_FAILURE);
+}
+
 void COMPILE(SyntaxTree_* tree) {
-    if(tree->MainFuncReturnType) // Int by default
+    
+    if(tree->MainFuncReturnType && tree->errors == 1) // Int by default
     {
         FILE* file = fopen("cmpler.s","w");
 
         if(file)
         {
             /* This is where all of the functions will be globalized */
-            fprintf(file,"section .text\n\tglobal _start\n\tglobal main\n\tglobal print\n\t%%define system_call int 0x80\n");
+            fprintf(file,"section .text\n\tglobal _start\n\tglobal err\n\tglobal main\n\tglobal print\n\t%%define system_call int 0x80\n");
+
+            fprintf(file,"\n;This will be used if there is a error captured during\n;compilation\nerr:\n\n\tmov eax, 1\n\tmov ebx, 1\n\tsystem_call\n");
 
             /* STARTUP OF THE MAIN FUNCTION */
             CompileMainFunction(file,tree->main_function_return_val, tree->amount_of_variables_, tree);
@@ -109,13 +121,14 @@ void COMPILE(SyntaxTree_* tree) {
 
             //fprintf(file,"\n\tmov esp, ebp\n\tpop ebp\n\tsystem_call\n\n\tmov eax, 1\n\tmov ebx, %d\n\tsystem_call\n",tree->main_function_return_val);
 
-            if(tree->n_items != 0)
+            if(tree->n_items_to_print != 0)
             {
                 evaluate_print_function(file,tree);
             }
 
             /* Evaluating main function variables */
-            evaluate_variables(file,tree);
+            if(tree->main_function_variable_names)
+                evaluate_variables(file,tree);
 
             fclose(file);
         }

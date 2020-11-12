@@ -27,6 +27,6 @@ int main(int args, char* argv[]) {
     Parser_* parser = init_parser(lex);
     SyntaxTree_* lang_tree = parse_bite(parser);
 
-    COMPILE(lang_tree);
+    if(lang_tree->errors != 0) COMPILE(lang_tree);
     return 0;
 }

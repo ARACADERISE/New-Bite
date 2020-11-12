@@ -4,6 +4,7 @@ SyntaxTree_* init_syntax_tree(int type) {
     SyntaxTree_* syntax_tree = calloc(1,sizeof(*syntax_tree));
 
     syntax_tree->BranchType = type;
+    syntax_tree->errors = 1;
 
     /* Branch_MainFunction */
     syntax_tree->function_name = (void*)0; // should be main
@@ -20,7 +21,7 @@ SyntaxTree_* init_syntax_tree(int type) {
     /* Printing Function */
     syntax_tree->things_to_print = calloc(1,sizeof(*syntax_tree->things_to_print));
     syntax_tree->item_types = calloc(1,sizeof(*syntax_tree->item_types));
-    syntax_tree->n_items = 0;
+    syntax_tree-> n_items_to_print = 0;
 
     /* Branch_Function_Declaration */
     syntax_tree->func_name = (void*)0;
