@@ -115,6 +115,7 @@ Tokens_* get_next_token(lexer_* lexer) {
             case ';': return move_pointer_with_token(";",Token_semicolon,lexer);
             case ',': return move_pointer_with_token(",",Token_Comma,lexer);
             case '=': return move_pointer_with_token("=",Token_Equals,lexer);
+            case '\'': return move_pointer_with_token("'", Token_SingleQuotes,lexer); 
             case '\0': break;
             default: {
                 fprintf(stderr,"\nUknown character `%c` caught on line %d\n",lexer->current_char,lexer->line);

@@ -24,6 +24,10 @@ typedef struct Tokens {
         Token_String,
         Token_Array,
         Token_Void,
+        Token_Use,
+        Token_Make,
+        Token_SingleQuotes,
+        Token_DoubleQuotes,
         Token_eof
     } TokenType;
     int main_was_found; // helper variable for now. Will be removed when the compiler is implemented

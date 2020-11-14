@@ -10,8 +10,21 @@ typedef struct SyntaxTree {
         Branch_String_Keyword,
         Branch_Int_Keyword,
         Branch_Array_Keword,
+        Branch_Use_Keyword,
+        Branch_STD_LIB,
         Branch_EOF
     } BranchType;
+
+    struct SyntaxTree** combined;
+    size_t length;
+
+    /* Use keyword */
+    char** files_to_import;
+    size_t l_of_imports;
+
+    /* Standard libs */
+    char** standard_functions_found;
+    size_t l_of_std_funcs;
 
     /* If this is zero, we will not compile */
     int errors;

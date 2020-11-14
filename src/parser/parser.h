@@ -10,6 +10,10 @@ typedef struct Parser {
     Tokens_* curr_tokens;
     Tokens_* prev_tokens;
     lexer_* lexer;
+
+    struct {
+        char* curr_std_lib;
+    } *StdLib;
 } Parser_;
 
 Parser_* init_parser(lexer_* lexer);

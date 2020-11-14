@@ -98,42 +98,51 @@ void evaluate_print_function(FILE* file, SyntaxTree_* tree)
 
 void Exit()
 {
-    exit(EXIT_FAILURE);
+    return exit(EXIT_FAILURE);
 }
 
 void COMPILE(SyntaxTree_* tree) {
     
-    if(tree->MainFuncReturnType && tree->errors == 1) // Int by default
+    int main_found = -1;
+    for(int i = 0; i < tree->length; i++)
     {
-        FILE* file = fopen("cmpler.s","w");
-
-        if(file)
+        if(tree->combined[i]->MainFuncReturnType && tree->errors == 1) // Int by default
         {
-            /* This is where all of the functions will be globalized */
-            fprintf(file,"section .text\n\tglobal _start\n\tglobal err\n\tglobal main\n\tglobal print\n\t%%define system_call int 0x80\n");
+            FILE* file = fopen("cmpler.s","w");
 
-            fprintf(file,"\n;This will be used if there is a error captured during\n;compilation\nerr:\n\n\tmov eax, 1\n\tmov ebx, 1\n\tsystem_call\n");
-
-            /* STARTUP OF THE MAIN FUNCTION */
-            CompileMainFunction(file,tree->main_function_return_val, tree->amount_of_variables_, tree);
-
-            fprintf(file,"\n\n_start:\n\n\tpush ebp\n\tmov ebp, esp\n\tsub esp, 16\n\tsystem_call\n\n\tcall main\n\tpop ebp\n\tmov esp, ebp\n\tsystem_call\n\n\tmov eax, 1\n\tmov ebx, 0\n\tsystem_call\n");
-
-            //fprintf(file,"\n\tmov esp, ebp\n\tpop ebp\n\tsystem_call\n\n\tmov eax, 1\n\tmov ebx, %d\n\tsystem_call\n",tree->main_function_return_val);
-
-            if(tree->n_items_to_print != 0)
+            if(file)
             {
-                evaluate_print_function(file,tree);
+
+                /* This is where all of the functions will be globalized */
+                fprintf(file,"section .text\n\tglobal _start\n\tglobal err\n\tglobal main\n\tglobal print\n\t%%define system_call int 0x80\n");
+
+                fprintf(file,"\n;This will be used if there is a error captured during\n;compilation\nerr:\n\n\tmov eax, 1\n\tmov ebx, 1\n\tsystem_call\n");
+
+                /* STARTUP OF THE MAIN FUNCTION */
+                CompileMainFunction(file,tree->main_function_return_val, tree->combined[i]->amount_of_variables_, tree->combined[i]);
+
+                fprintf(file,"\n\n_start:\n\n\tpush ebp\n\tmov ebp, esp\n\tsub esp, 16\n\tsystem_call\n\n\tcall main\n\tpop ebp\n\tmov esp, ebp\n\tsystem_call\n\n\tmov eax, 1\n\tmov ebx, 0\n\tsystem_call\n");
+
+                //fprintf(file,"\n\tmov esp, ebp\n\tpop ebp\n\tsystem_call\n\n\tmov eax, 1\n\tmov ebx, %d\n\tsystem_call\n",tree->main_function_return_val);
+
+                if(tree->combined[i]->n_items_to_print != 0)
+                {
+                    evaluate_print_function(file,tree->combined[i]);
+                }
+
+                /* Evaluating main function variables */
+                if(tree->combined[i]->main_function_variable_names)
+                    evaluate_variables(file,tree->combined[i]);
+
+                fclose(file);
+                main_found = 0;
             }
-
-            /* Evaluating main function variables */
-            if(tree->main_function_variable_names)
-                evaluate_variables(file,tree);
-
-            fclose(file);
+        } else {
+            if(i == tree->length-1)
+            {
+                fprintf(stderr,"\nError: Main function was now encountered\n\n");
+                exit(EXIT_FAILURE);
+            }
         }
-    } else {
-        fprintf(stderr,"\nError: Main function was now encountered\n\n");
-        exit(EXIT_FAILURE);
     }
 }

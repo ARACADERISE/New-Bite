@@ -5,6 +5,13 @@ SyntaxTree_* init_syntax_tree(int type) {
 
     syntax_tree->BranchType = type;
     syntax_tree->errors = 1;
+    syntax_tree->combined = calloc(1,sizeof(*syntax_tree->combined));
+    syntax_tree->length = 0;
+
+    syntax_tree->files_to_import = calloc(1,sizeof(*syntax_tree->files_to_import));
+    syntax_tree->l_of_imports = 0;
+    syntax_tree->standard_functions_found = calloc(1,sizeof(*syntax_tree->standard_functions_found));
+    syntax_tree->l_of_std_funcs = 0;
 
     /* Branch_MainFunction */
     syntax_tree->function_name = (void*)0; // should be main

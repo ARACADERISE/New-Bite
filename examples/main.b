@@ -2,8 +2,11 @@
     To do, work on other function declaration that can be used
 */
 
+use 'std_io';
+
 fun main() { // defaults to int if does not contain :Int or :Void
-    age:In = 155;
-    Print(age,15,age,15,age);
+    make bruh:Int = 553;
+
+    //Print(bruh);
     ret 0;
 }
