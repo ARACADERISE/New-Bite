@@ -4,7 +4,7 @@
 
 use 'std_io';
 
-fun main() { // defaults to int if does not contain :Int or :Void
+fun main() {
     make bruh:Int = 553;
 
     //Print(bruh);

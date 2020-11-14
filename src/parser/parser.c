@@ -29,127 +29,6 @@ static Parser_* move_token_pointer(Parser_* parser, int current_token) {
 static void parse_main_function_body(Parser_* parser, SyntaxTree_* tree, SyntaxTree_* all) {
     redo:
     switch(parser->curr_tokens->TokenType) {
-        case Token_Print_Function: {
-            /*
-                THIS IS JUST TESTING!
-                THIS WILL BE REMOVED!
-            */
-            move_token_pointer(parser, Token_Print_Function);
-
-            if(parser->curr_tokens->TokenType == Token_LP)
-            {
-                // one type of syntax
-                move_token_pointer(parser, Token_LP);
-
-                if(parser->curr_tokens->TokenType != Token_id)
-                {
-                    fprintf(stderr,"\nMissing arguemtns for built-in Print statement.\n");
-                    tree->errors = 0;
-                    Exit();
-                }
-                
-                REDO:
-                if(!(tree->main_function_variable_names)) {
-                    tree-> n_items_to_print++;
-                    tree->things_to_print = realloc(
-                        tree->things_to_print,
-                        (tree-> n_items_to_print+1)*sizeof(*tree->things_to_print)
-                    );
-
-                    if(isdigit(parser->curr_tokens->token_value[0]))
-                    {
-                        tree->item_types = realloc(
-                            tree->item_types,
-                            (tree-> n_items_to_print+1)*sizeof(*tree->item_types)
-                        );
-                        tree->item_types[tree-> n_items_to_print-1] = "Int";
-                    }
-
-                    tree->things_to_print[tree-> n_items_to_print-1] = parser->curr_tokens->token_value;
-
-                    move_token_pointer(parser,Token_id);
-                }
-                if(tree->main_function_variable_names)
-                {
-                    int index = -1; // zero by default
-                    for(int i = 0; i < tree->amount_of_variables_; i++)
-                    {
-                        if(strcmp(tree->main_function_variable_names[i],parser->curr_tokens->token_value)==0)
-                        {
-                            index = i;
-                            break;
-                        }
-
-                        if(i == tree->amount_of_variables_-1)
-                        {
-                            if(isdigit(parser->curr_tokens->token_value[0])) {
-                                break;
-                            }
-                            fprintf(stderr,"\nThe variable `%s` does not exist.\n",parser->curr_tokens->token_value);
-                            Exit();
-                        }
-                    }
-
-                    if(index > -1){
-                        if(strcmp(tree->main_function_variable_types[index],"Int")==0)
-                        {
-                            tree-> n_items_to_print++;
-                            tree->things_to_print = realloc(
-                                tree->things_to_print,
-                                (tree-> n_items_to_print+1)*sizeof(*tree->things_to_print)
-                            );
-
-                            tree->things_to_print[tree-> n_items_to_print-1] = tree->main_function_variable_names[index];
-                        }
-                    } else {
-                        tree-> n_items_to_print++;
-                        tree->things_to_print = realloc(
-                            tree->things_to_print,
-                            (tree-> n_items_to_print+1)*sizeof(*tree->things_to_print)
-                        );
-
-                        if(isdigit(parser->curr_tokens->token_value[0]))
-                        {
-                            tree->item_types = realloc(
-                                tree->item_types,
-                                (tree-> n_items_to_print+1)*sizeof(*tree->item_types)
-                            );
-                            tree->item_types[tree-> n_items_to_print-1] = "Int";
-                        }
-
-                        tree->things_to_print[tree-> n_items_to_print-1] = parser->curr_tokens->token_value;
-                    }
-
-                    move_token_pointer(parser, Token_id);
-
-                    if(parser->curr_tokens->TokenType == Token_Comma)
-                    {
-                        move_token_pointer(parser, Token_Comma);
-                        goto REDO;
-                    }
-
-                    if(parser->curr_tokens->TokenType == Token_RP)
-                        move_token_pointer(parser, Token_RP);
-                    else
-                    {
-                        fprintf(stderr,"\n\033[3;31mError:\n\tMissing `)` for Print function\n\tLine: %d\n",parser->lexer->line);
-                        tree->errors = 0;
-                        Exit();
-                        //exit(EXIT_FAILURE);
-                    }
-
-                    move_token_pointer(parser, Token_semicolon);
-                }
-            }
-
-            if(parser->curr_tokens->TokenType == Token_RC)
-            {
-                //printf("\nCompiled successfuly\n");
-                break;
-            }
-            goto redo;
-            //exit(EXIT_SUCCESS);
-        }
         case Token_Make: { // variable declaration
             move_token_pointer(parser,Token_Make);
             tree->amount_of_variables_++;
@@ -420,6 +299,36 @@ static SyntaxTree_* parse_function(Parser_* parser,SyntaxTree_* all) {
 
                 move_token_pointer(parser,Token_LP);
                 move_token_pointer(parser,Token_RP);
+
+                if(parser->curr_tokens->TokenType == Token_Colon)
+                {
+                    move_token_pointer(parser,Token_Colon);
+
+                    switch(parser->curr_tokens->TokenType)
+                    {
+                        case Token_Void: {
+                            tree->standard_function_return_types = realloc(
+                                tree->standard_function_return_types,
+                                (tree->l_of_std_funcs+1)*sizeof(*tree->standard_function_return_types)
+                            );
+                            tree->standard_function_return_types[tree->l_of_std_funcs-1] = "Void";
+                            move_token_pointer(parser,Token_Void);
+                            break;
+                        }
+                        case Token_Int: {
+                            tree->standard_function_return_types = realloc(
+                                tree->standard_function_return_types,
+                                (tree->l_of_std_funcs+1)*sizeof(*tree->standard_function_return_types)
+                            );
+                            tree->standard_function_return_types[tree->l_of_std_funcs-1] = "Int";
+                            move_token_pointer(parser,Token_Int);
+                            break;
+                        }
+                        default: {
+                            break; // there should not be an error with standard libs
+                        }
+                    }
+                }
                 move_token_pointer(parser,Token_LC);
 
                 switch(parser->curr_tokens->TokenType)

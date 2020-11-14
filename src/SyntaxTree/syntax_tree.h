@@ -24,6 +24,7 @@ typedef struct SyntaxTree {
 
     /* Standard libs */
     char** standard_functions_found;
+    char** standard_function_return_types;
     size_t l_of_std_funcs;
 
     /* If this is zero, we will not compile */

@@ -1,3 +1,3 @@
-fun print() {
+fun print():Void {
     Print(55);
 }
